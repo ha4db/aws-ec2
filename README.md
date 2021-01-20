@@ -1,3 +1,17 @@
+# Ha4db instance
+
+This is a project for ha4db deploy.
+
+## How to use
+
+```sh
+npm install -g aws-cdk
+npm install
+cdk deploy --profile your-profile
+aws ssm start-session --target your-instance --profile your-profile
+```
+
+
 # Welcome to your CDK TypeScript project!
 
 This is a blank project for TypeScript development with CDK.
