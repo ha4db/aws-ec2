@@ -3,7 +3,6 @@ import * as ec2 from '@aws-cdk/aws-ec2'
 import * as iam from '@aws-cdk/aws-iam'
 import * as elbv2 from "@aws-cdk/aws-elasticloadbalancingv2"
 import * as targets from "@aws-cdk/aws-elasticloadbalancingv2-targets"
-import { listenerCount } from 'process'
 
 export class AwsEc2Stack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -51,6 +50,16 @@ export class AwsEc2Stack extends cdk.Stack {
     })
     instanceSg.addIngressRule(albSg, ec2.Port.tcp(3000))
 
+    // user data
+    const userData = ec2.UserData.forLinux({ shebang: "#!/bin/bash" })
+    userData.addCommands(
+      "apt update",
+      "apt install -y software-properties-common",
+      "apt-add-repository --yes --update ppa:ansible/ansible",
+      "apt install -y ansible",
+      "apt install -y git",
+    )
+
     // EC2 Instance
     const ami = 'ami-0f2dd5fc989207c82' // Ubuntu 20.04 LTS
     const machineImage = ec2.MachineImage.genericLinux({
@@ -67,7 +76,8 @@ export class AwsEc2Stack extends cdk.Stack {
           volume: ec2.BlockDeviceVolume.ebs(10),
         }
       ],
-      securityGroup: instanceSg
+      securityGroup: instanceSg,
+      userData: userData,
     })
 
     // ALB
