@@ -11,6 +11,11 @@ cdk deploy --profile your-profile
 aws ssm start-session --target your-instance --profile your-profile
 ```
 
+## Remove all
+
+```sh
+cdk destroy --profile your-profile
+```
 
 # Welcome to your CDK TypeScript project!
 
