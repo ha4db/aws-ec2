@@ -60,6 +60,20 @@ export class AwsEc2Stack extends cdk.Stack {
       "apt install -y git",
     )
 
+    // set instance type
+    let instance_type = 't2.small'
+    const defined_instance_type = this.node.tryGetContext('instance_type')
+    if (defined_instance_type) {
+      instance_type = defined_instance_type
+    }
+
+    // set ebs device size
+    let ebs_volume_size = 10
+    const defined_ebs_volume_size = this.node.tryGetContext('ebs_volume_size')
+    if (defined_ebs_volume_size) {
+      ebs_volume_size = parseInt(defined_ebs_volume_size)
+    }
+
     // EC2 Instance
     const ami = 'ami-0f2dd5fc989207c82' // Ubuntu 20.04 LTS
     const machineImage = ec2.MachineImage.genericLinux({
@@ -67,13 +81,13 @@ export class AwsEc2Stack extends cdk.Stack {
     })
     const instance = new ec2.Instance(this, 'ha4db-main', {
       vpc,
-      instanceType: new ec2.InstanceType('t2.small'),
+      instanceType: new ec2.InstanceType(instance_type),
       machineImage: machineImage,
       role,
       blockDevices: [
         {
           deviceName: '/dev/sda1',
-          volume: ec2.BlockDeviceVolume.ebs(10),
+          volume: ec2.BlockDeviceVolume.ebs(ebs_volume_size),
         }
       ],
       securityGroup: instanceSg,
