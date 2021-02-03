@@ -55,7 +55,6 @@ export class AwsEc2Stack extends cdk.Stack {
     userData.addCommands(
       "apt update",
       "apt install -y software-properties-common",
-      "apt-add-repository --yes --update ppa:ansible/ansible",
       "apt install -y ansible",
       "apt install -y git",
     )
