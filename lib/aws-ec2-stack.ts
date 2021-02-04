@@ -1,6 +1,8 @@
 import * as cdk from '@aws-cdk/core'
 import * as ec2 from '@aws-cdk/aws-ec2'
 import * as iam from '@aws-cdk/aws-iam'
+import * as route53 from '@aws-cdk/aws-route53'
+import * as certificatemanager from '@aws-cdk/aws-certificatemanager'
 import * as elbv2 from "@aws-cdk/aws-elasticloadbalancingv2"
 import * as targets from "@aws-cdk/aws-elasticloadbalancingv2-targets"
 
@@ -101,10 +103,37 @@ export class AwsEc2Stack extends cdk.Stack {
       securityGroup: albSg
     })
 
+    let parent_domain_name:string|null = null
+    let domain_name:string|null = null
+    const defined_parent_domain_name = this.node.tryGetContext('parent_domain_name')
+    const defined_domain_name = this.node.tryGetContext('domain_name')
+    if (defined_parent_domain_name && defined_domain_name) {
+      parent_domain_name = defined_parent_domain_name
+      domain_name = defined_domain_name
+    }
+
     // ALB listener
-    const listener = alb.addListener('ha4db-alb-listener', {
-      port: 80
-    })
+    let listener
+    const listener_name = 'ha4db-alb-listener'
+    if (parent_domain_name && domain_name) {
+      const hosted_zone = route53.HostedZone.fromLookup(this, 'HostedZone', {
+        domainName: parent_domain_name
+      })
+      const certificate = new certificatemanager.DnsValidatedCertificate(this, 'Certificate', {
+        domainName: domain_name,
+        hostedZone: hosted_zone,
+        validation: certificatemanager.CertificateValidation.fromDns(hosted_zone),
+      })
+      const listener_certificate = elbv2.ListenerCertificate.fromCertificateManager(certificate)
+      listener = alb.addListener(listener_name, {
+        port: 443,
+        certificates: [listener_certificate]
+      })
+    } else {
+      listener = alb.addListener('ha4db-alb-listener', {
+        port: 80
+      })
+    }
 
     // ALB listener target
     listener.addTargets('ha4db-alb-target', {

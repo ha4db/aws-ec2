@@ -45,4 +45,6 @@ cdk deploy --profile your-profile -c instance_type=t2.xlarge
 
 - `instance_type`: instance type (default: t2.small)
 - `ebs_volume_size`: ebs volume size of instance (default: 10)
+- `zone_name`: public hosting zone name (default: null)
+- `domain_name`: domain name (default: null)
   
