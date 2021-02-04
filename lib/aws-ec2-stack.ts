@@ -92,6 +92,7 @@ export class AwsEc2Stack extends cdk.Stack {
       securityGroup: instanceSg,
       userData: userData,
     })
+    instance.instance.creditSpecification = { cpuCredits: 'standard' }
 
     // ALB
     const alb = new elbv2.ApplicationLoadBalancer(this, 'ha4db-alb', {
