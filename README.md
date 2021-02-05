@@ -12,8 +12,9 @@ export CDK_DEFAULT_REGION=your-aws-region
 npm install -g aws-cdk
 npm install
 cdk deploy --profile your-profile
-# run bootstrap
+# run bootstrap if you need (see error message)
 cdk bootstrap aws://xxxxxxxxx/your-aws-region --profile your-profile
+cdk deploy --profile your-profile
 ```
 
 ### connect instance and setup
@@ -42,7 +43,7 @@ cdk destroy --profile your-profile
 You can change value with context.
 
 ```sh
-cdk deploy --profile your-profile -c instance_type=t2.xlarge
+cdk deploy --profile your-profile -c instance_type=t2.xlarge -c parent_domain_name=example.org. -c domain_name=app.example.org
 ```
 
 ### Supported context
