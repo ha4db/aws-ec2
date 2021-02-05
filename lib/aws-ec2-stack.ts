@@ -2,6 +2,7 @@ import * as cdk from '@aws-cdk/core'
 import * as ec2 from '@aws-cdk/aws-ec2'
 import * as iam from '@aws-cdk/aws-iam'
 import * as route53 from '@aws-cdk/aws-route53'
+import * as alias from '@aws-cdk/aws-route53-targets'
 import * as certificatemanager from '@aws-cdk/aws-certificatemanager'
 import * as elbv2 from "@aws-cdk/aws-elasticloadbalancingv2"
 import * as targets from "@aws-cdk/aws-elasticloadbalancingv2-targets"
@@ -128,6 +129,11 @@ export class AwsEc2Stack extends cdk.Stack {
       listener = alb.addListener(listener_name, {
         port: 443,
         certificates: [listener_certificate]
+      })
+      new route53.ARecord(this, 'AliasRecord', {
+        zone: hosted_zone,
+        target: route53.RecordTarget.fromAlias(new alias.LoadBalancerTarget(alb)),
+        recordName: domain_name,
       })
     } else {
       listener = alb.addListener('ha4db-alb-listener', {
