@@ -101,7 +101,8 @@ export class AwsEc2Stack extends cdk.Stack {
     const alb = new elbv2.ApplicationLoadBalancer(this, 'ha4db-alb', {
       vpc,
       internetFacing: true,
-      securityGroup: albSg
+      securityGroup: albSg,
+      idleTimeout: cdk.Duration.seconds(3600),
     })
 
     let parent_domain_name:string|null = null
